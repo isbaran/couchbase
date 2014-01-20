@@ -88,6 +88,10 @@ ruby_block "block_until_operational" do
     end
   end
   action :nothing
+  only_if do
+    pid = ::File.join(node['couchbase']['server']['install_dir'], "var", "lib", "couchbase", "couchbase-server.pid")
+    CouchbaseHelper.service_alive?(pid)
+  end
 end
 
 directory node['couchbase']['server']['log_dir'] do

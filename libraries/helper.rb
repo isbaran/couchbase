@@ -53,4 +53,24 @@ module CouchbaseHelper
   rescue EOFError, Errno::ECONNREFUSED
     return false
   end
+
+  def self.service_alive?(pid)
+    5.times do
+      begin
+        cb_pid = File.read(pid).strip
+      rescue
+        Chef::Log.debug("Couldn't read Couchbase pid file")
+        return false
+      end
+
+      if File.exists? "/proc/#{cb_pid}"
+        Chef::Log.debug("Couchbase server is running with pid #{cb_pid}")
+        return true
+      else
+        sleep 1
+      end
+    end
+    Chef::Log.debug("Couchbase server is not running")
+    return false
+  end
 end
